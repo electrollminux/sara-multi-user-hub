@@ -53,7 +53,7 @@ The default 3D avatar included in this project (`static/sara.vrm`) is subject to
 * **Alterations & Redistribution:** Allowed, provided these exact non-commercial and attribution conditions are maintained.
 
 **3. Want to commercialize this project? Just swap the model!**
-The AI and 3D engine are completely modular. If you want to use this project for a commercial product, SaaS, or corporate tool, simply delete `static/sara.vrm` and replace it with your own `.vrm` avatar (one that you made or have commercial rights to). Name your new file `sara.vrm`, drop it in the `static` folder, and the non-commercial restriction is lifted!
+The AI and 3D engine are completely modular. If you want to use this project for a commercial product, SaaS, or corporate tool, simply delete `static/sara.vrm` and replace it with your own `.vrm` avatar (one that you made or have commercial rights to). Name your new file `your_new_model.vrm`, drop it in the `static` folder, and the non-commercial restriction is lifted!
 
 1. Drop your new `.vrm` file into the `static/` folder.
 2. Open `sara_multi_user.py` and locate the `GLTFLoader` in the JavaScript section (around line [344](https://github.com/electrollminux/sara-multi-user-hub/blob/78ff072eeb591a40501c372f033d00603eea56d0/main.py#L344)).
