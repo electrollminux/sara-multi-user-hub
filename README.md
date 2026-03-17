@@ -1,7 +1,8 @@
 # Sara - 3D AI Group Study Hub
 
-![Mobile View] (assets\mobile_view.jpeg)
-![Chat Overview] (assets\chat_overview.png)
+![Mobile_View](https://github.com/electrollminux/sara-multi-user-hub/blob/main/assets/mobile_view.jpeg?raw=true)
+![Chat_Overview](https://github.com/electrollminux/sara-multi-user-hub/blob/main/assets/chat_overview.png?raw=true)
+
 Sara is a real-time, multi-user 3D AI mentor designed to host group study sessions. Built with Flask, Three.js, and Llama 3, she acts as a slightly strict, tsundere physics and mathematics tutor. 
 
 She features real-time voice synthesis, dynamic 3D facial expressions and body kinematics, long-term vector memory, and live environment awareness (location, weather, and world news).
