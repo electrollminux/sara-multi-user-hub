@@ -39,11 +39,26 @@ You don't need to host this on an expensive cloud server! Because it has integra
 
 *Note: Because this is a live group chat, everyone will see the same messages, and Sara will interact with whoever speaks, keeping track of different users seamlessly.*
 
-## 4. License & Credits
+## 4. License & Customization
 
-**Source Code:** All Python, JavaScript, and HTML code in this repository is open-source and licensed under the [MIT License](LICENSE).
+This project uses a split-licensing model to protect both the open-source code and the original 3D artist's rights.
 
-**3D Asset (`sara.vrm`):** The 3D avatar used in this project is subject to its original creator's specific terms of use and is **NOT** covered by the MIT License. If you fork or download this project, you must adhere to the following rules regarding the avatar:
+**1. The Source Code (MIT License)**
+All Python, JavaScript, and HTML code in this repository is completely open-source and licensed under the [MIT License](LICENSE). You are free to modify, distribute, and commercialize the *codebase itself*.
+
+**2. The Default 3D Asset (`sara.vrm`)**
+The default 3D avatar included in this project (`static/sara.vrm`) is subject to its original creator's terms of use and is **NOT** covered by the MIT License. As long as you are using this default model, you must adhere to these rules:
 * **Attribution:** Required (Original Creator: [imslowash](https://hub.vroid.com/en/users/73989979))
 * **Commercial Use:** Strictly Prohibited (No individual or corporate commercial use).
-* **Alterations & Redistribution:** Allowed, provided these exact same non-commercial and attribution conditions are maintained.
+* **Alterations & Redistribution:** Allowed, provided these exact non-commercial and attribution conditions are maintained.
+
+**3. Want to commercialize this project? Just swap the model!**
+The AI and 3D engine are completely modular. If you want to use this project for a commercial product, SaaS, or corporate tool, simply delete `static/sara.vrm` and replace it with your own `.vrm` avatar (one that you made or have commercial rights to). Name your new file `sara.vrm`, drop it in the `static` folder, and the non-commercial restriction is lifted!
+
+1. Drop your new `.vrm` file into the `static/` folder.
+2. Open `sara_multi_user.py` and locate the `GLTFLoader` in the JavaScript section (around line [344](https://github.com/electrollminux/sara-multi-user-hub/blob/78ff072eeb591a40501c372f033d00603eea56d0/main.py#L344)).
+3. Change the file path from `'/static/sara.vrm'` to the name of your new file:
+   ```javascript
+   loader.load('/static/your_new_model.vrm', (gltf) => {...}
+   ```
+4. Save the file and restart your server. The new avatar will automatically inherit the procedural blinking, breathing, and lip-sync animations! 
