@@ -1,0 +1,19 @@
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments
+venv/
+env/
+.venv/
+
+# ChromaDB Long-Term Memory (Do not upload your friends' chat history!)
+sara_group_vault/
+
+# Generated TTS Audio (Keeps the repo lightweight)
+static/audio/*.mp3
+
+# Environment Variables / Secrets
+.env

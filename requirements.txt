@@ -1,0 +1,6 @@
+Flask==3.0.0
+groq==0.4.2
+chromadb==0.4.22
+textblob==0.17.1
+edge-tts==6.1.9
+requests==2.31.0
