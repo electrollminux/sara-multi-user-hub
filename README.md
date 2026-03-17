@@ -39,7 +39,7 @@ You don't need to host this on an expensive cloud server! Because it has integra
 
 *Note: Because this is a live group chat, everyone will see the same messages, and Sara will interact with whoever speaks, keeping track of different users seamlessly.*
 
-## ⚖️ License & Credits
+## 4. License & Credits
 
 **Source Code:** All Python, JavaScript, and HTML code in this repository is open-source and licensed under the [MIT License](LICENSE).
 
