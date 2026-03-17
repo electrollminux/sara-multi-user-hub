@@ -38,3 +38,12 @@ You don't need to host this on an expensive cloud server! Because it has integra
 4. **Join the Hub:** They just need to click the link on their phone or PC. They don't need to install Python, download the 3D model, or configure any API keys. Everything runs off your machine!
 
 *Note: Because this is a live group chat, everyone will see the same messages, and Sara will interact with whoever speaks, keeping track of different users seamlessly.*
+
+## ⚖️ License & Credits
+
+**Source Code:** All Python, JavaScript, and HTML code in this repository is open-source and licensed under the [MIT License](LICENSE).
+
+**3D Asset (`sara.vrm`):** The 3D avatar used in this project is subject to its original creator's specific terms of use and is **NOT** covered by the MIT License. If you fork or download this project, you must adhere to the following rules regarding the avatar:
+* **Attribution:** Required (Original Creator: [imslowash](https://hub.vroid.com/en/users/73989979))
+* **Commercial Use:** Strictly Prohibited (No individual or corporate commercial use).
+* **Alterations & Redistribution:** Allowed, provided these exact same non-commercial and attribution conditions are maintained.

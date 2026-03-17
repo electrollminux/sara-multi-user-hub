@@ -1,0 +1,10 @@
+Asset: sara.vrm
+Creator: [imslowash]
+
+Conditions of Use:
+- Avatar Use: Allow
+- Corporate use: Do not allow
+- Individual commercial use: Do not allow
+- Redistribution: Allow
+- Alterations: Allow
+- Attribution: Required
