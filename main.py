@@ -18,13 +18,10 @@ from flask import Flask, request, Response
 
 # --- CONFIGURATION ---
 GROQ_API_KEY = "YOUR_GROQ_API_KEY_HERE"  # <-- Paste your Groq key here
-NEWS_API_KEY = "YOUR_NEWSAPI_KEY_HERE"  # <-- Paste your NewsAPI key here
-LOOPHOLE_HOSTNAME = "YOUR_LOOPHOLE_HOSTNAME_HERE"  # <-- If using Loophole, put your hostname here (e.g. "myapp.loophole.site")
-
-
+NEWS_API_KEY = "YOUR_NEWSAPI" # key here (get one for free at https://newsapi.org/) 
 SARA_BIRTH = datetime.datetime(2008, 4, 21)
 DB_PATH = "./sara_group_vault"
-
+LOOPHOLE_HOSTNAME = "Your_Loophole_Hostname"  # <-- Paste your Loophole hostname here (get one for free at https://loophole.dev/)
 
 AUDIO_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "audio")
 os.makedirs(AUDIO_DIR, exist_ok=True)
@@ -147,7 +144,8 @@ html_content = """
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        canvas { position: fixed; top: 0; left: 0; z-index: 0; }
+        /* Fixed pointer events so canvas doesn't steal touches on mobile */
+        canvas { position: fixed; top: 0; left: 0; z-index: 0; pointer-events: none; }
         
         #welcome-screen { position: fixed; z-index: 1000; transition: opacity 0.5s ease; }
         #status-bar { position: fixed; top: 20px; right: 20px; z-index: 200; pointer-events: none; }
@@ -216,7 +214,7 @@ html_content = """
             </p>
             <div class="d-flex flex-column align-items-center gap-3">
                 <input type="text" id="welcome-username" class="form-control form-control-lg bg-dark text-info border-info text-center w-75 rounded-pill" placeholder="Enter your display name..." autocomplete="off">
-                <button class="btn btn-outline-info btn-lg rounded-pill px-5 fw-bold" onclick="enterHub()">JOIN SESSION</button>
+                <button id="join-btn" class="btn btn-outline-info btn-lg rounded-pill px-5 fw-bold" onclick="enterHub()" disabled>CONNECTING...</button>
             </div>
         </div>
     </div>
@@ -288,33 +286,39 @@ html_content = """
             }, 500);
         };
 
+        document.getElementById('welcome-username').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !document.getElementById('join-btn').disabled) window.enterHub();
+        });
+
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 1.4, 2.6);
+        
+        // --- MOBILE CAMERA RIG FIX ---
+        // Pushes the camera further back and down so she fits into a vertical screen!
+        if (isMobile) {
+            camera.position.set(0, 1.2, 3.8); 
+        } else {
+            camera.position.set(0, 1.4, 2.6);
+        }
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        
-        // --- UPGRADED MOBILE GRAPHICS (Pixel Ratio Fix) ---
-        // Prevents ultra-high density displays from rendering too many pixels, 
-        // keeping the framerate buttery smooth while maintaining sharpness.
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
 
-        // --- UPGRADED CINEMATIC LIGHTING ---
-        // 1. Key Light (Main bright light from top-right)
-        const light = new THREE.DirectionalLight(0xffffff, 1.2); 
-        light.position.set(1, 2, 1).normalize();
-        scene.add(light); 
-        
-        // 2. Hemisphere Light (Adds realistic volume and 3D depth by simulating sky/ground ambient bounce)
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
-        hemiLight.position.set(0, 5, 0);
-        scene.add(hemiLight);
+        // --- WINDOW RESIZE LISTENER ---
+        // Handles switching between portrait and landscape instantly
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
 
-        // 3. Rim Light (A subtle cyan light from behind to make her pop out from the dark background)
-        const rimLight = new THREE.DirectionalLight(0x0dcaf0, 0.6);
-        rimLight.position.set(-1, 0.5, -2).normalize();
+        const light = new THREE.DirectionalLight(0xffffff, 1.2); light.position.set(1, 2, 1).normalize();
+        scene.add(light); 
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8); hemiLight.position.set(0, 5, 0);
+        scene.add(hemiLight);
+        const rimLight = new THREE.DirectionalLight(0x0dcaf0, 0.6); rimLight.position.set(-1, 0.5, -2).normalize();
         scene.add(rimLight);
 
         let currentVrm = null; let isTalking = false; const clock = new THREE.Clock();
@@ -336,15 +340,44 @@ html_content = """
         let currentPose = 'neutral';
 
         const loader = new GLTFLoader(); loader.register((parser) => new VRMLoaderPlugin(parser));
-        loader.load('/static/sara.vrm', (gltf) => {
-            const vrm = gltf.userData.vrm; VRMUtils.removeUnnecessaryJoints(gltf.scene);
-            scene.add(vrm.scene); currentVrm = vrm; vrm.scene.rotation.y = Math.PI;
-            if (vrm.lookAt) vrm.lookAt.target = lookAtTarget;
-            if(vrm.humanoid) {
-                vrm.humanoid.getNormalizedBoneNode('leftUpperArm').rotation.z = 1.25;
-                vrm.humanoid.getNormalizedBoneNode('rightUpperArm').rotation.z = -1.25;
+        loader.load(
+            '/static/sara.vrm', 
+            (gltf) => {
+                const vrm = gltf.userData.vrm; VRMUtils.removeUnnecessaryJoints(gltf.scene);
+                scene.add(vrm.scene); currentVrm = vrm; vrm.scene.rotation.y = Math.PI;
+                if (vrm.lookAt) vrm.lookAt.target = lookAtTarget;
+                if(vrm.humanoid) {
+                    vrm.humanoid.getNormalizedBoneNode('leftUpperArm').rotation.z = 1.25;
+                    vrm.humanoid.getNormalizedBoneNode('rightUpperArm').rotation.z = -1.25;
+                }
+                
+                // --- LOADING SUCCESS ---
+                // Unlocks the button only when she is fully loaded in memory!
+                const joinBtn = document.getElementById('join-btn');
+                if(joinBtn) {
+                    joinBtn.innerText = "JOIN SESSION";
+                    joinBtn.disabled = false;
+                }
+            },
+            (progress) => {
+                // --- LOADING TRACKER ---
+                // Shows mobile users that a big file is currently downloading
+                const joinBtn = document.getElementById('join-btn');
+                if(!joinBtn) return;
+                if(progress.total > 0) {
+                    const percent = Math.round((progress.loaded / progress.total) * 100);
+                    joinBtn.innerText = `LOADING MODEL... ${percent}%`;
+                } else {
+                    const mb = (progress.loaded / 1024 / 1024).toFixed(1);
+                    joinBtn.innerText = `LOADING MODEL... ${mb}MB`;
+                }
+            },
+            (error) => {
+                console.error(error);
+                const joinBtn = document.getElementById('join-btn');
+                if(joinBtn) joinBtn.innerText = "ERROR LOADING MODEL";
             }
-        });
+        );
 
         function lerpBone(boneName, axis, targetValue, delta, speed = 6.0) {
             if (!currentVrm || !currentVrm.humanoid) return;
@@ -361,13 +394,6 @@ html_content = """
             if (delta > 0.1) delta = 0.1; 
             const t = clock.elapsedTime;
             
-            const newAspect = window.innerWidth / window.innerHeight;
-            if (Math.abs(camera.aspect - newAspect) > 0.05) {
-                camera.aspect = newAspect;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            }
-
             if (currentVrm && currentVrm.humanoid) {
                 currentVrm.update(delta); 
 
@@ -506,9 +532,6 @@ html_content = """
                         console.error("Audio failed to load. Falling back to text mode.");
                         textEl.innerText = fullText;
                         textEl.classList.remove('cursor');
-                        
-                        // --- UPGRADED TEXT READING TIME ---
-                        // Gives you plenty of time to read long text blocks if the audio fails.
                         setTimeout(resetUIState, fullText.length * 70 + 4000); 
                     };
 
@@ -531,8 +554,6 @@ html_content = """
                     };
                     
                     audioObj.onended = function() {
-                        // --- UPGRADED TEXT READING TIME ---
-                        // Leaves the text bubble visibly on screen for 4 full seconds after she finishes speaking.
                         setTimeout(resetUIState, 4000);
                     };
                 }
@@ -662,7 +683,6 @@ class SaraCore:
 
         if ip_address and ip_address not in ['127.0.0.1', 'localhost', '::1']:
             try:
-                # 1. Fast Geolocation
                 ip_data = requests.get(f"http://ip-api.com/json/{ip_address}", timeout=4).json()
                 if ip_data.get('status') == 'success':
                     city = ip_data['city']
@@ -671,7 +691,6 @@ class SaraCore:
                     lon = ip_data['lon']
                     location = f"{city}, {country}"
 
-                    # 2. Fast Open-Meteo Weather
                     try:
                         weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
                         weather_req = requests.get(weather_url, timeout=4).json()
