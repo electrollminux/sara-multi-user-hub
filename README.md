@@ -20,7 +20,7 @@ She features real-time voice synthesis, dynamic 3D facial expressions and body k
 
 ### 2. Clone & Install
 ```bash
-git clone [https://github.com/YOUR_USERNAME/sara-group-hub.git](https://github.com/YOUR_USERNAME/sara-group-hub.git)
+git clone https://github.com/electrollminux/sara-multi-user-hub.git
 cd sara-group-hub
 pip install -r requirements.txt
 ```
